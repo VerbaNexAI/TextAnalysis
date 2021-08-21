@@ -85,4 +85,30 @@ class Processing(object):
         except Exception as e :
             print('Error delete_special_patterns: {0}'.format(e))
         return result
+    
+    @staticmethod
+    def get_normalized_text(folder_path: str, file_name: str) -> str:
+        """Extrae el texto de un archivo de texto plano y lo normaliza
+
+        Parameters
+        ----------
+        ruta_carpeta : str
+            string con la ruta de la carpeta donde se encuentre el archivo a normalizar
+        nombre_archivo : str
+            nombre del archivo que desea normalizar
+
+        Returns
+        -------
+        posicion 1 : str
+            texto normalizado con encoding utf-8
+        """
+        text = ''
+        try:
+            with open(f'{folder_path}/{file_name}', 'r', encoding='latin1') as file:
+                text = file.read()
+                text = self.proper_encoding(text)
+                return text
+        except Exception as e:
+            print(f'Error: {e}')
+
 
