@@ -68,13 +68,13 @@ class TextProcessing(object):
         try:
             text_out = TextProcessing.proper_encoding(text)
             text_out = text_out.lower()
-            text_out = re.sub("[\U0001f000-\U000e007f]", ' ', text_out) if '[EMOJI]' else text_out
+            text_out = re.sub("[\U0001f000-\U000e007f]", '[EMOJI]', text_out)
             text_out = re.sub(
                 r'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+'
                 r'|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))',
-                ' ', text_out) if '[URL]' else text_out
-            text_out = re.sub("@([A-Za-z0-9_]{1,40})", ' ', text_out) if '[MENTION]' else text_out
-            text_out = re.sub("#([A-Za-z0-9_]{1,40})", ' ', text_out) if '[HASTAG]' else text_out
+                '[URL]', text_out)
+            text_out = re.sub("@([A-Za-z0-9_]{1,40})", '[MENTION]', text_out)
+            text_out = re.sub("#([A-Za-z0-9_]{1,40})", '[HASTAG]', text_out)
             text_out = TextProcessing.remove_patterns(text_out)
             # text_out = TextAnalysis.lemmatization(text_out) if lemmatizer else text_out
             text_out = TextProcessing.stopwords(text_out) if stopwords else text_out
