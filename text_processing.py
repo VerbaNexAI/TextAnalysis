@@ -3,8 +3,6 @@ import nltk
 import spacy
 import unicodedata
 import requests
-from spacy_syllables import SpacySyllables
-from bs4 import BeautifulSoup
 from nltk import TweetTokenizer
 from spacy.lang.es import Spanish
 from spacy.lang.en import English
@@ -28,8 +26,7 @@ class TextProcessing(object):
             for token in doc:
                 item = {'text': token.text, 'lemma': token.lemma_, 'pos': token.pos_, 'tag': token.tag_,
                         'dep': token.dep_, 'shape': token.shape_, 'is_alpha': token.is_alpha,
-                        'is_stop': token.is_stop, 'is_digit': token.is_digit, 'is_punct': token.is_punct,
-                        'syllables': token._.syllables}
+                        'is_stop': token.is_stop, 'is_digit': token.is_digit, 'is_punct': token.is_punct}
                 list_tagger.append(item)
             return list_tagger
         except Exception as e:
@@ -43,8 +40,6 @@ class TextProcessing(object):
                 spacy.cli.download(spacy_model[lang])
 
             component = spacy.load(spacy_model[lang])
-            SpacySyllables(component)
-            component.add_pipe('syllables', last=True)
             print('- Text Processing: {0}'.format(component.pipe_names))
             return component
         except Exception as e:
@@ -122,45 +117,6 @@ class TextProcessing(object):
             return [' '.join(grams) for grams in n_grams]
         except Exception as e:
             print('Error make_ngrams: {0}'.format(e))
-
-    @staticmethod
-    def get_URL_title(text: str):
-        result = ''
-        pattern = r'\([0-9]*:[0-9]*\) => '  # Definimos los patrones a buscar y variables
-        patern2 = r'\[|\]'  # con las que manipularemos los datos
-        patern3 = r'[\-\?\:\;\$\%\^\&\*\(\)\|\!\`\'\"\,\<\.\>]'
-        URL_cont = ''
-
-        try:
-            text = TextProcessing.transformer(text)
-            urx = re.sub(patern2, '', re.sub(pattern, '', str(text.urls)))
-            if urx != "None":  # Se leeran los urls para obtener el titulo de las paginas
-                if "," in urx:  # aqui se revisa si existe mas de 1 url
-                    tado = urx.split(",")
-                else:
-                    tado = urx + "," + "https://www.google.com"
-                    tado = tado.split(",")  # en caso contrario se agrega una direccion default
-                for cor in tado:
-                    link = cor  # para evitar errores en este ciclo
-                    reqs = requests.get(link)
-                    soup = BeautifulSoup(reqs.text, 'html.parser')
-                    for title in soup.find_all('title'):
-                        if title.getText() == "Google":
-                            URL_cont += "Null"  # aqui se elimina la pagina default
-                        elif title.getText() != "Página no encontrada":
-                            var = title.getText()  # en caso de obtener el titulo de la pagina
-                            temp0 = re.sub(patern3, '', var)  # aqui normalizaremos el
-                            temp0 = temp0.lower()
-                            URL_cont += "" + str(temp0)  # Se guarda en el contenido
-                        else:
-                            URL_cont += "Null"  # si la pagina no es encontrada
-                URL_cont += "~"
-            elif urx == "None":
-                URL_cont += "Null" + "~"  # En caso de no haber urls , se agrega null
-                result = URL_cont.split("~")
-        except Exception as e:
-            print('Error delete_special_patterns: {0}'.format(e))
-        return result
 
 
 if __name__ == '__main__':
